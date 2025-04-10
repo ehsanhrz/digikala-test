@@ -42,7 +42,7 @@ this design implemented by a human and AI only edited the format of MD and check
 ## 1. Overview
 
 - **Purpose**: Manages advertising campaigns, updates their status (e.g., active, paused) based on user budget and wallet balance, and ensures ads run only when funds are available.
-- **Implementation**: Built as a stateless microservice (e.g., using PHP Laravel or Java Spring Boot) for scalability and ease of deployment.
+- **Implementation**: Built as a microservice (e.g., using PHP Laravel or Java Spring Boot) for scalability and ease of deployment.
 
 ## 2. Database Layer (MongoDB)
 
@@ -81,7 +81,7 @@ this design implemented by a human and AI only edited the format of MD and check
 ## 1. Overview
 
 - **Purpose**: Delivers advertisements to end users based on active campaigns managed by the Advertising Management Service.
-- **Implementation**: A lightweight, stateless service (e.g., using PHP or Nginx with a CDN) optimized for low-latency ad serving.
+- **Implementation**: A lightweight, stateless service (e.g., using PHP or ... with a CDN) optimized for low-latency ad serving.
 
 ## 2. Key Features
 
