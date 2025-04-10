@@ -34,8 +34,16 @@ this design implemented by a human and AI only edited the format of MD and check
     - Read-only queries (e.g., balance checks) are load-balanced across slaves.
 - Partitioning Logic:  
   Data is sharded by `userId` hashed with location metadata, ensuring even distribution. Slaves are geographically distributed to reduce latency for location-based reads.
+- **Load Balancing and Failure Handling**:
+  - PgBouncer is configured with a dynamic load balancer (e.g., HAProxy) to monitor slave health and distribute read queries intelligently. If a slave (e.g., SOUTH EAST Iran) comes under heavy load or fails, the load balancer reroutes traffic to available slaves (e.g., SOUTH WEST Iran) based on capacity and latency.
+  - Fallback mechanism: If all slaves in a region fail, queries can temporarily hit the master (with rate limiting) until a slave recovers, ensuring availability at the cost of increased master load.
+  - Slave recovery: Failed slaves are automatically re-provisioned or synced from the master using PostgreSQL replication tools (e.g., repmgr).
 - Consistency:  
   Master-slave replication introduces slight read-after-write latency. Use synchronous replication for critical operations (e.g., fund deduction) if strong consistency is needed, or rely on eventual consistency for non-critical reads.
+- **Design Decisions**:
+  - PostgreSQL is chosen as an RDBMS for its ACID compliance, ensuring atomicity, consistency, isolation, and durability (ACID).
+  - Transactions are used alongside distributed locks for write operations (e.g., fund deductions) to guarantee consistency. For example, a `POST /wallet/{userId}/deduct` request wraps the balance update and transaction log in a single transaction, ensuring that either both succeed or neither does, even under concurrent access.
+  - Distributed locks (Redis/ZooKeeper) complement transactions by preventing race conditions across service instances, while PostgreSQL’s atomic transactions ensure data integrity within the database.
 
 # Advertising Management Service
 
@@ -81,7 +89,7 @@ this design implemented by a human and AI only edited the format of MD and check
 ## 1. Overview
 
 - **Purpose**: Delivers advertisements to end users based on active campaigns managed by the Advertising Management Service.
-- **Implementation**: A lightweight, stateless service (e.g., using PHP or ... with a CDN) optimized for low-latency ad serving.
+- **Implementation**: A lightweight, stateless service (e.g., using FastAPI or Nginx with a CDN) optimized for low-latency ad serving.
 
 ## 2. Key Features
 
